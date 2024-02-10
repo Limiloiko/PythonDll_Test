@@ -1,4 +1,4 @@
-/* addtest_basic.c
+/* main.c
 
    Demonstrates using the function imported from the DLL, the inelegant way.
 */

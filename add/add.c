@@ -1,4 +1,4 @@
-/* add_basic.c
+/* add.c
 
    Demonstrates creating a DLL with an exported function, the inflexible way.
 */
