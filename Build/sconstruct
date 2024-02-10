@@ -1,0 +1,4 @@
+
+env = Environment()
+
+SConscript('SConscript', variant_dir='Build\_wrk', duplicate=0)

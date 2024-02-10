@@ -1,3 +1,7 @@
+# outpout files
 *.dll
 *.o
 *.exe
+
+# scons
+*.dblite
