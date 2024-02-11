@@ -1,0 +1,61 @@
+from SCons.Script import *
+from pprint import pformat
+import glob
+import os
+
+# Set the compiler and linker options
+env = Environment(
+    ENV = {'PATH': os.environ['PATH']},
+    CC = 'gcc',
+    LINK = 'gcc',
+    CPPPATH = [],  # Additional include paths if needed
+    LIBPATH = [],  # Additional library paths if needed
+    LIBS = [],     # Additional libraries if needed
+)
+
+## Construction variables
+# The suffix used for (static) object file names.
+env['OBJSUFFIX'] = ".o"
+# The suffix used for shared object file names.
+env['SHOBJSUFFIX'] = ".dll"
+# General options that are passed to the C compiler (C only; not C++)
+env['CFLAGS'] = "-Wl,--subsystem,windows"
+# General options that are passed to the C and C++ compilers.
+env['CCFLAGS'] = ""
+# General user options passed to the linker. Note that this variable should not contain -l (or similar)
+# options for linking with the libraries listed in $LIBS, nor -L (or similar) library search path options
+# that scons generates automatically from $LIBPATH. See $_LIBFLAGS above, for the variable that expands to
+# library-link options, and $_LIBDIRFLAGS above, for the variable that expands to library search path options.
+# See also $SHLINKFLAGS. for linking shared objects. 
+env['LINKFLAGS'] = ""
+
+# The command line used to compile a C source file to a (static) object file.
+# Any options specified in the $CFLAGS, $CCFLAGS and $CPPFLAGS construction variables
+# are included on this command line. See also $SHCCCOM for compiling to shared objects. 
+env['CCCOM'] = "$CC -o $TARGET -c $SOURCES $CFLAGS $CCFLAGS"
+# The command line used to compile a C source file to a shared-library object file. Any options specified
+# in the $SHCFLAGS, $SHCCFLAGS and $CPPFLAGS construction variables are included on this command line.
+# See also $CCCOM for compiling to static objects. 
+env['SHCCCOM'] = "$SHCC -o $TARGET -s -shared $CHANGED_SOURCES $SHCFLAGS $SHCCFLAGS $_CCCOMCOM"
+# The command line used to link object files into an executable. See also $SHLINKCOM for linking shared objects.
+env['LINKCOM'] = "$LINK $LINKFLAGS -o $TARGET -s $_LIBDIRFLAGS $_LIBFLAGS $_PDB $SOURCES"
+
+## Output style
+env['LINKCOMSTR'] = ".Linking $TARGET"
+env['CCCOMSTR'] = ".Compiling $TARGET"
+env['SHCCCOMSTR'] = ".Compiling shared object $TARGET"
+
+debug = open("env.txt", "w", encoding="utf8")
+for item in sorted(env.Dictionary().items()):
+    debug.writelines("construction variable = '%s', value = '%s'\n" % item)
+debug.close()
+
+# build shared-lib
+lib = env.SharedObject("add.dll", "src/add/add.c")
+
+# # now build with mingw
+program = env.Program('main', "src/main/main.c", LIBS=[lib])
+
+# # Set that main depends on shared library
+# env.Depends(program, "add")
+

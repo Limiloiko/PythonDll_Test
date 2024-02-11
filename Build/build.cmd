@@ -23,7 +23,26 @@ python -m pip install -r Build\requirements.txt
 
 echo [34mCalling scons[0m
 scons
+rem Check the error level
+if %errorlevel% neq 0 (
+    goto error
+) else (
+    goto success
+)
 
+:error
+echo:
+echo  [31mBUILD ERROR[0m
+echo:
+goto end
+
+:success
+echo:
+echo  [32mBUILD SUCCESS[0m
+echo:
+goto end
+
+:end
 echo [34mRemoving files[0m
 echo:
 del sconstruct

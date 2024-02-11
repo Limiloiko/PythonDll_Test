@@ -11,8 +11,25 @@
       "options": {
         "cmd": "${workspaceFolder}",
         "statusbar": {
-            "color": "#ff0000",
-            "label": "build"
+            "color": "#00ff0d",
+            "label": "Build"
+        }
+      }
+    },
+    {
+      "label": "Clean",
+      "type": "shell",
+      "command": "cmd.exe",
+        "args": [
+          "/C",
+          "rd /S /Q Build\\_wrk"
+        ],
+      "group": "build",
+      "options": {
+        "cmd": "${workspaceFolder}",
+        "statusbar": {
+            "color": "#f6ff00",
+            "label": "Clean"
         }
       }
     }

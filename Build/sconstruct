@@ -1,4 +1,3 @@
-
-env = Environment()
+from SCons.Script import *
 
 SConscript('SConscript', variant_dir='Build\_wrk', duplicate=0)
