@@ -16,12 +16,16 @@ env = Environment(
 ## Construction variables
 # The suffix used for (static) object file names.
 env['OBJSUFFIX'] = ".o"
+
 # The suffix used for shared object file names.
-env['SHOBJSUFFIX'] = ".dll"
+env['SHOBJSUFFIX'] = ".o"
+
 # General options that are passed to the C compiler (C only; not C++)
 env['CFLAGS'] = "-Wl,--subsystem,windows"
+
 # General options that are passed to the C and C++ compilers.
 env['CCFLAGS'] = ""
+
 # General user options passed to the linker. Note that this variable should not contain -l (or similar)
 # options for linking with the libraries listed in $LIBS, nor -L (or similar) library search path options
 # that scons generates automatically from $LIBPATH. See $_LIBFLAGS above, for the variable that expands to
@@ -32,18 +36,30 @@ env['LINKFLAGS'] = ""
 # The command line used to compile a C source file to a (static) object file.
 # Any options specified in the $CFLAGS, $CCFLAGS and $CPPFLAGS construction variables
 # are included on this command line. See also $SHCCCOM for compiling to shared objects. 
-env['CCCOM'] = "$CC -o $TARGET -c $SOURCES $CFLAGS $CCFLAGS"
+env['CCCOM'] = "$CC -c -o $TARGET -c $SOURCES $CFLAGS $CCFLAGS"
+
 # The command line used to compile a C source file to a shared-library object file. Any options specified
 # in the $SHCFLAGS, $SHCCFLAGS and $CPPFLAGS construction variables are included on this command line.
 # See also $CCCOM for compiling to static objects. 
-env['SHCCCOM'] = "$SHCC -o $TARGET -s -shared $CHANGED_SOURCES $SHCFLAGS $SHCCFLAGS $_CCCOMCOM"
+env['SHCFLAGS'] = "-D ADD_EXPORTS"
+env['SHCCCOM'] = "$SHCC -c -o $TARGET $CHANGED_SOURCES $SHCFLAGS $SHCCFLAGS $_CCCOMCOM"
+
 # The command line used to link object files into an executable. See also $SHLINKCOM for linking shared objects.
-env['LINKCOM'] = "$LINK $LINKFLAGS -o $TARGET -s $_LIBDIRFLAGS $_LIBFLAGS $_PDB $SOURCES"
+env['LINKCOM'] = "$LINK $LINKFLAGS -o $TARGET -s $SOURCES $_LIBDIRFLAGS $_LIBFLAGS"
+
+# The command line used to link programs using shared libraries. See also $LINKCOM for linking static objects. 
+env['SHLINKCOM'] = "$LINK $LINKFLAGS -o $TARGET -s --shared $LIBS $SOURCES $CFLAGS"
+
+# libs
+env['LIBDIRPREFIX'] = "-L"
+env['LIBPATH'] = "Build/_wrk"
+env['LIBSUFFIX'] = ""
+env['LIBLINKPREFIX'] = "-l"
 
 ## Output style
-env['LINKCOMSTR'] = ".Linking $TARGET"
-env['CCCOMSTR'] = ".Compiling $TARGET"
-env['SHCCCOMSTR'] = ".Compiling shared object $TARGET"
+# env['LINKCOMSTR'] = ".Linking $TARGET"
+# env['CCCOMSTR'] = ".Compiling $TARGET"
+# env['SHCCCOMSTR'] = ".Compiling shared object $TARGET"
 
 debug = open("env.txt", "w", encoding="utf8")
 for item in sorted(env.Dictionary().items()):
@@ -51,11 +67,7 @@ for item in sorted(env.Dictionary().items()):
 debug.close()
 
 # build shared-lib
-lib = env.SharedObject("add.dll", "src/add/add.c")
+lib = env.SharedLibrary("add.dll", "src/add/add.c")
 
-# # now build with mingw
-program = env.Program('main', "src/main/main.c", LIBS=[lib])
-
-# # Set that main depends on shared library
-# env.Depends(program, "add")
-
+# now build with mingw
+program = env.Program('main', "src/main/main.c", LIBS="add")
