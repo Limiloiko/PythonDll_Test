@@ -16,5 +16,5 @@ def print_dll_contents(dll_path):
         print("Error:", e)
 
 if __name__ == "__main__":
-    dll_path = "F:\\Workspace\\Build_Dll\\Build\\_wrk\\add.dll"
+    dll_path = ".\\Build\\_wrk\\add.dll"
     print_dll_contents(dll_path)
